@@ -2,20 +2,24 @@ package com.example.defense.service;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.FormatStyle;
 
 @Data
 @NoArgsConstructor
 public class SearchRequest{
 
     private Integer line;
-    private String origin;
+    private String date;
     private String destiny;
 
-    public SearchRequest(Integer line, String origin, String destiny){
+    public SearchRequest(Integer line, String date, String destiny){
         this.line = validateLine(line);
-        this.origin = validateString(origin);
-        this.destiny = validateString(destiny);;
+        this.date = validateInputDate(date);
+        this.destiny = validateString(destiny);
     }
 
     private Integer validateLine(Integer line){
@@ -25,10 +29,21 @@ public class SearchRequest{
         return line;
     }
 
-    private String validateString(String origin){
-        if(null == origin || origin.trim().isEmpty() ){
+    private String validateInputDate(String date){
+        LocalDate localDate;
+        try{
+            localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        } catch(DateTimeParseException ex) {
+            String msg = String.format("Could not parse this %s, porque es otro formato", date);
+            throw new IllegalArgumentException(msg, ex);
+        }
+        return localDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)); // LONG, MEDIUM, SHORT
+    }
+
+    private String validateString(String destiny){
+        if(null == destiny || destiny.trim().isEmpty() ){
             throw new IllegalArgumentException("Origin and Destiny can't be null");
         }
-        return origin;
+        return destiny;
     }
 }

@@ -18,6 +18,7 @@ public class TrainService {
     }
 
     public List<Train> search(SearchRequest searchRequest){
+
         List<Train> trains = trainStore.getTrains();
 
         return trains.stream()

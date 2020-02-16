@@ -3,38 +3,38 @@ package com.example.defense.controller;
 import com.example.defense.model.Train;
 import com.example.defense.service.SearchRequest;
 import com.example.defense.service.TrainService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
-// @RequestMapping("/")
+
 public class DefenseController{
 
-    @Autowired
-    TrainService trainService;
+    private TrainService trainService;
+
+    public DefenseController(TrainService trainService){
+        this.trainService = trainService;
+    }
 
     @GetMapping("/trains")
-    public String getTrains(@RequestBody Train train){
+    public Collection<Train> getTrains(@RequestBody Train train){
 
-        SearchRequest searchRequest = new SearchRequest(train.getLine(), train.getOrigin(), train.getDestiny());
+        SearchRequest searchRequest = new SearchRequest(train.getLine(), train.getDate(), train.getDestiny());
 
-        // TrainService trainService = this.trainService.trainSearch();
         List<Train> found = trainService.search(searchRequest);
 
         return displayTrains(found);
-
     }
 
-    private static String displayTrains(List<Train> found){
+    private static Collection<Train> displayTrains(List<Train> found){
         if(found.isEmpty()){
-            return "NO TRAIN FOUND";
+            throw new NullPointerException("There is no train match!");
         } else{
-            return Arrays.toString(found.toArray());
+            return found;
         }
     }
 }
